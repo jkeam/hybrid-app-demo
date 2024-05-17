@@ -1,0 +1,155 @@
+﻿apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  labels:
+    app: wordpress-be
+    app.kubernetes.io/part-of: wordpress-demo
+    vm.kubevirt.io/template: windows2k22-server-medium
+    vm.kubevirt.io/template.namespace: openshift
+    vm.kubevirt.io/template.revision: '1'
+    vm.kubevirt.io/template.version: v0.26.0
+  name: wordpress-be
+  namespace: demo-hybrid
+spec:
+  dataVolumeTemplates:
+    - metadata:
+        creationTimestamp: null
+        name: wordpress-be-installation-cdrom
+      spec:
+        source:
+          http:
+            url: 'http://rhdata6.dota-lab.iad.redhat.com/win2022.iso'
+        storage:
+          resources:
+            requests:
+              storage: 20Gi
+    - metadata:
+        creationTimestamp: null
+        name: wordpress-be
+      spec:
+        preallocation: false
+        source:
+          blank: {}
+        storage:
+          resources:
+            requests:
+              storage: 100Gi
+          storageClassName: odf-hdd-3-replicas
+  running: true
+  template:
+    metadata:
+      annotations:
+        vm.kubevirt.io/flavor: medium
+        vm.kubevirt.io/os: windows2k22
+        vm.kubevirt.io/workload: server
+      creationTimestamp: null
+      labels:
+        kubevirt.io/domain: wordpress-be
+        kubevirt.io/size: medium
+    spec:
+      architecture: amd64
+      domain:
+        clock:
+          timer:
+            hpet:
+              present: false
+            hyperv: {}
+            pit:
+              tickPolicy: delay
+            rtc:
+              tickPolicy: catchup
+          utc: {}
+        cpu:
+          cores: 4
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+            - bootOrder: 1
+              disk:
+                bus: scsi
+              name: rootdisk
+            - bootOrder: 2
+              cdrom:
+                bus: sata
+              name: installation-cdrom
+            - cdrom:
+                bus: sata
+              name: windows-drivers-disk
+            - cdrom:
+                bus: sata
+              name: sysprep
+          inputs:
+            - bus: usb
+              name: tablet
+              type: tablet
+          interfaces:
+            - bridge: {}
+              macAddress:
+              model: e1000e
+              name: podnet
+              ports:
+              - name: rdp
+                protocol: TCP
+                port: 3389
+            - bridge: {}
+              macAddress:
+              model: virtio
+              name: labnet
+            - bridge: {}
+              macAddress:
+              model: virtio
+              name: airgap
+          tpm: {}
+        features:
+          acpi: {}
+          apic: {}
+          hyperv:
+            frequencies: {}
+            ipi: {}
+            reenlightenment: {}
+            relaxed: {}
+            reset: {}
+            runtime: {}
+            spinlocks:
+              spinlocks: 8191
+            synic: {}
+            synictimer:
+              direct: {}
+            tlbflush: {}
+            vapic: {}
+            vpindex: {}
+          smm: {}
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: true
+        machine:
+          type: pc-q35-rhel9.2.0
+        memory:
+          guest: 16Gi
+        resources: {}
+      networks:
+        - multus:
+            networkName: airgap
+          name: airgap
+        - name: podnet
+          pod: {}
+        - multus:
+            networkName: labnet
+          name: labnet
+      terminationGracePeriodSeconds: 3600
+      volumes:
+        - dataVolume:
+            name: wordpress-be
+          name: rootdisk
+        - dataVolume:
+            name: wordpress-be-installation-cdrom
+          name: installation-cdrom
+        - containerDisk:
+            image: 'registry.redhat.io/container-native-virtualization/virtio-win-rhel9@sha256:a8d455491d6c1ff45c6d8d340aa804313ce5613a59f53c7f4a5fcb61c14cc9fc'
+          name: windows-drivers-disk
+        - name: sysprep
+          sysprep:
+            configMap:
+              name: sysprep-wordpress-be
