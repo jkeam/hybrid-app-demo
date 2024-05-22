@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-be-rdp
+spec:
+  selector:
+    kubevirt.io/domain: wordpress-be
+  ports:
+    - name: rdp
+      protocol: TCP
+      port: 3389
+      targetPort: 3389
+      nodePort: 31389
+  externalTrafficPolicy: Cluster
+  type: NodePort
