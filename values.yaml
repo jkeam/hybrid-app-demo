@@ -1,2 +1,4 @@
 namespace:
   name: hybrid-app-namespace
+serviceAccount:
+  name: hybrid-app-sa
