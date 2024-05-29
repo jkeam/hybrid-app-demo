@@ -1,8 +1,15 @@
 namespace:
   name: hybrid-app-namespace
+
 serviceAccount:
   name: hybrid-app-sa
-role:
-  name: hybrid-app-role
+
 roleBinding:
   name: hybrid-app-rolebinding
+
+configMap:
+  wordpressFeConfig:
+    name: wordpress-config
+    wp_redis_host: wordpress-cache # Name of the Redis Service
+
+
