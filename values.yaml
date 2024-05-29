@@ -11,5 +11,48 @@ configMap:
   wordpressFeConfig:
     name: wordpress-config
     wp_redis_host: wordpress-cache # Name of the Redis Service
+  sysprepWindows:
+    name: sysprep-wordpress-be
+    autounattend:
+      FullName: "Administrator"
+      Organization: "Organization"
+      ProductKey: "NF4JM-Q8GD3-XJFCT-WBBGY-G3DVJ"
+      ComputerName: "wordpress-be"
+      Password: "1776t@Hd3R"  # This password will be used for both the Windows VM and the MySQL DB login
+      Owner: "Owner"
+      TimeZone: "Eastern Standard Time"
+      LocalAccountDescription: "Administrator"
+      LocalAccountDisplayName: "Administrator"
+      LocalAccountGroup: "Administrators"
+      LocalAccountName: "Administrator"
+      Username: "Administrator"
+    postInstall:
+      mysqlInstallerUri: "http://bills-web-server.apps.tacos.dota-lab.iad.redhat.com/mysql-8.4.0-winx64.msi"
+      vcRedistributablesUri: "http://bills-web-server.apps.tacos.dota-lab.iad.redhat.com/VC_redist.x64.exe"
+      mysqlInstallerFile: "mysql-8.4.0-winx64.msi"
+      vcRedistributablesFile: "vc_redist.x64.exe"
+      mysqlBaseDataDir: 'C:\ProgramData\MySQL\MySQL Server 8.0'
+      mysqlBaseInstallDir: 'C:\Program Files\MySQL\MySQL Server 8.4'
+      mysqlServiceName: "MySQL80"
+      firewallRuleDisplayName: "MySQL Server"
+      additionalScripts: []  # Any additional powershell commands you want to run include here
+    myIni:
+      slowQueryLogFile: "WORDPRESS-BE-slow.log"
+      logErrorFile: "WORDPRESS-BE.err"
+      logBinFile: "WORDPRESS-BE-bin"
 
+service:
+  wordpressFe:
+    name: wordpress-fe
+  wordpressCache:
+    name: wordpress-cache
+  wordpressBeRdp:
+    name: wordpress-be-rdp
+    nodePort: 31389
+  wordpressBe:
+    name: wordpress-be
 
+deployment:
+  wordpressFe:
+    dbUser: "wordpress_user"
+    dbName: "wordpress_db"
