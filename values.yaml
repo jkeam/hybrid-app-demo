@@ -4,3 +4,5 @@ serviceAccount:
   name: hybrid-app-sa
 role:
   name: hybrid-app-role
+roleBinding:
+  name: hybrid-app-rolebinding
