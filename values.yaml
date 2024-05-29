@@ -52,6 +52,20 @@ service:
   wordpressBe:
     name: wordpress-be
 
+pvc:
+  redisData:
+    name: redis-data-pvc
+    accessMode: ReadWriteOnce
+    storage: 10Gi
+    storageClassName: odf-nvme-2-replicas
+    volumeMode: Filesystem
+  wordpressPlugins:
+    name: wordpress-plugins-pvc
+    accessMode: ReadWriteOnce
+    storage: 10Gi
+    storageClassName: odf-nvme-2-replicas
+    volumeMode: Filesystem
+
 deployment:
   wordpressFe:
     dbUser: "wordpress_user"

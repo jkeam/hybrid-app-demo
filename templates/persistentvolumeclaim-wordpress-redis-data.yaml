@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.pvc.redisData.name }}
+  namespace: {{ .Values.namespace.name }}
+  annotations:
+    "helm.sh/hook": "pre-install,pre-upgrade"
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
+spec:
+  accessModes:
+  - {{ .Values.pvc.redisData.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.pvc.redisData.storage }}
+  storageClassName: {{ .Values.pvc.redisData.storageClassName }}
+  volumeMode: {{ .Values.pvc.redisData.volumeMode }}
