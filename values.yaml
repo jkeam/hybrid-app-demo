@@ -2,3 +2,5 @@ namespace:
   name: hybrid-app-namespace
 serviceAccount:
   name: hybrid-app-sa
+role:
+  name: hybrid-app-role
