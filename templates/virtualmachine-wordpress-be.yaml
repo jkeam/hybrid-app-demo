@@ -13,7 +13,6 @@ metadata:
   annotations:
     "helm.sh/hook": "pre-install,pre-upgrade"
     "helm.sh/hook-weight": "9"
-    "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
 spec:
   dataVolumeTemplates:
     - metadata:
@@ -27,6 +26,7 @@ spec:
           resources:
             requests:
               storage: {{ .Values.vm.wordpressBe.installationCdromStorage }}
+          storageClassName: {{ .Values.installationCdromStorageClass }}
     - metadata:
         creationTimestamp: null
         name: wordpress-be
@@ -38,7 +38,7 @@ spec:
           resources:
             requests:
               storage: {{ .Values.vm.wordpressBe.rootDiskStorage }}
-          storageClassName: {{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseInstallDir }}
+          storageClassName: {{ .Values.rootDiskStorageClass }}
   running: {{ .Values.vm.wordpressBe.running }}
   template:
     metadata:

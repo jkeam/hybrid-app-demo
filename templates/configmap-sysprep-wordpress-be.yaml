@@ -6,7 +6,6 @@ metadata:
   annotations:
     "helm.sh/hook": "pre-install,pre-upgrade"
     "helm.sh/hook-weight": "-1"
-    "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
 data:
   Autounattend.xml: |-
     <?xml version="1.0" encoding="utf-8"?>
@@ -213,7 +212,6 @@ data:
     #####################################
     # Perform some basic configurations #
     #####################################
-
     Write-Host "Performing some basic configurations"
     # Configure legacy control panel view
     Start-Process reg -Wait -ArgumentList 'add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ControlPanel" /v StartupPage /t REG_DWORD /d 1 /f'
@@ -225,13 +223,11 @@ data:
     Write-Host "Setting all network profiles to private"
     $networkProfile = Get-NetConnectionProfile
     Set-NetConnectionProfile -InterfaceAlias $networkProfile.InterfaceAlias -NetworkCategory Public
-
     Write-Host "Renaming network adapters"
     $networks = Get-NetAdapter
     foreach ($network in $networks) {
         try {
             $dnsSuffix = (Get-DnsClient -InterfaceAlias $network.Name | Select-Object -ExpandProperty ConnectionSpecificSuffix)
-
             if ($dnsSuffix -like 'airgap*') {
                 $newName = "Airgap Network"
             } elseif ($dnsSuffix -like 'dota-lab*') {
@@ -241,7 +237,6 @@ data:
             } else {
                 $newName = $null
             }
-
             if ($newName) {
                 Rename-NetAdapter -Name $network.Name -NewName $newName
                 Write-Host "Renamed $($network.Name) to $newName"
@@ -250,7 +245,6 @@ data:
             Write-Host "An error occurred while processing $($network.Name), but continuing to the next command."
         }
     }
-
     Write-Host "Installing additional drivers"
     # Install all remaining VirtIO drivers
     Start-Process msiexec -Wait -ArgumentList '/i E:\virtio-win-gt-x64.msi /qn /passive /norestart'
@@ -260,7 +254,6 @@ data:
     Start-Process msiexec -Wait -ArgumentList '/i E:\guest-agent\qemu-ga-x86_64.msi /qn /passive /norestart'
     # Install winfsp Guest Agent
     Start-Process msiexec -Wait -ArgumentList '/i E:\winfsp-1.12.22339.msi /qn /passive /norestart'
-
     Write-Host "Enabling RDP"
     # Enable RDP
     Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -value 0
@@ -268,7 +261,6 @@ data:
     #####################################
     # Perform custom post-install steps #
     #####################################
-
     Write-Host "Performing custom setup"
     Write-Host "Downloading MySQL Installer - Please be patient, this may take a few minutes..."
     Invoke-WebRequestWithRetry -Uri '{{ .Values.configMap.sysprepWindows.postInstall.mysqlInstallerUri }}' -OutFile "$env:USERPROFILE\Downloads\{{ .Values.configMap.sysprepWindows.postInstall.mysqlInstallerFile }}"
@@ -278,28 +270,22 @@ data:
     Start-Process -FilePath "$env:USERPROFILE\Downloads\{{ .Values.configMap.sysprepWindows.postInstall.vcRedistributablesFile }}" -ArgumentList '/install', '/quiet', '/norestart' -Wait -PassThru
     Write-Host "Installing MySQL"
     Start-Process -FilePath 'msiexec.exe' -ArgumentList "/i $env:USERPROFILE\Downloads\{{ .Values.configMap.sysprepWindows.postInstall.mysqlInstallerFile }} /qn" -Wait -PassThru
-
     Write-Host "Creating MySQL Data Directory"
     # Ensure the MySQL data directory exists
     New-Item -ItemType Directory -Force -Path "{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseDataDir }}\Data"
     New-Item -ItemType Directory -Force -Path "{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseDataDir }}\Uploads"
-
     Write-Host "Copying MySQL Configuration File"
     # Copy the my.ini file to the appropriate directory
     Copy-Item -Path "F:\my.ini" -Destination "{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseDataDir }}\my.ini" -Force
-
     Write-Host "Initializing MySQL Data Directory"
     # Initialize the MySQL data directory
     Start-Process -FilePath "{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseInstallDir }}\bin\mysqld.exe" -ArgumentList "--initialize-insecure --basedir=`"{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseInstallDir }}`" --datadir=`"{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseDataDir }}\Data`"" -Wait -PassThru
-
     Write-Host "Creating MySQL Service"
     # Create the MySQL service with the new configuration file
     Start-Process -FilePath "{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseInstallDir }}\bin\mysqld.exe" -ArgumentList "--install {{ .Values.configMap.sysprepWindows.postInstall.mysqlServiceName }} --defaults-file=`"{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseDataDir }}\my.ini`"" -Wait -PassThru
-
     Write-Host "Initializing MySQL Data Directory"
     # Initialize the MySQL data directory
     & "{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseInstallDir }}\bin\mysqld.exe" --initialize-insecure --basedir="{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseInstallDir }}" --datadir="{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseDataDir }}\Data"
-
     Write-Host "Creating MySQL Service"
     # Create the MySQL service with the new configuration file
     & "{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseInstallDir }}\bin\mysqld.exe" --install {{ .Values.configMap.sysprepWindows.postInstall.mysqlServiceName }} --defaults-file="{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseDataDir }}\my.ini"
@@ -307,19 +293,15 @@ data:
     Write-Host "Allowing MySQL traffic through firewall"
     # Allow MySQL traffic through the firewall
     New-NetFirewallRule -DisplayName "{{ .Values.configMap.sysprepWindows.postInstall.firewallRuleDisplayName }}" -Direction Inbound -Protocol TCP -LocalPort 3306 -Action Allow
-
     Write-Host "Starting MySQL Service"
     # Start the MySQL service
     Start-Service -Name "{{ .Values.configMap.sysprepWindows.postInstall.mysqlServiceName }}"
-
     Write-Host "Configuring MySQL"
     # Wait for MySQL service to be available
     Start-Sleep -Seconds 10
-
     Write-Host "Executing provided SQL file"
     # Execute the provided SQL file
     & "{{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseInstallDir }}\bin\mysql.exe" -u root -e "source F:\mysql_setup.sql"
-
     {{- if .Values.configMap.sysprepWindows.postInstall.additionalScripts }}
     Write-Host "Running Additional Custom Scripts"
     {{- range $script := .Values.configMap.sysprepWindows.postInstall.additionalScripts }}
@@ -327,16 +309,12 @@ data:
     {{- end }}
     Write-Host "Additional Custom Scripts Completed"
     {{- end }}
-
     Write-Host "Custom setup completed"
-
   my.ini: |-
     [client]
     port=3306
-
     [mysql]
     no-beep
-
     [mysqld]
     port=3306
     datadir={{ .Values.configMap.sysprepWindows.postInstall.mysqlBaseDataDir }}\Data

@@ -93,8 +93,10 @@ vm:
     size: medium
     running: false
     installationCdromUrl: 'http://rhdata6.dota-lab.iad.redhat.com/win2022.iso'
+    installationCdromStorageClass: odf-nvme-2-replicas
     installationCdromStorage: 20Gi
-    rootDiskStorage: 100Gi
+    rootDiskStorageClass: odf-hdd-3-replicas
+    rootDiskStorage: 120Gi
     cpuCores: 4
     cpuSockets: 1
     cpuThreads: 1
@@ -105,4 +107,4 @@ vm:
 route:
   wordpressFe:
     name: wordpress-fe
-    host: wordpress-demo.apps.tacos.dota-lab.iad.redhat.com
+    host: wordpress-demo-test.apps.tacos.dota-lab.iad.redhat.com
