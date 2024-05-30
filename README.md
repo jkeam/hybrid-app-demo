@@ -80,7 +80,7 @@ configMap:
     autounattend:
       FullName: "Administrator"
       Organization: "Organization"
-      ProductKey: "NF4JM-Q8GD3-XJFCT-WBBGY-G3DVJ"
+      ProductKey: "<YourProductKey>"   # Placeholder for product key value
       ComputerName: "wordpress-be"
       Password: "<YourPassword>"  # Placeholder for password value
       Owner: "Owner"
@@ -91,8 +91,8 @@ configMap:
       LocalAccountName: "Administrator"
       Username: "Administrator"
     postInstall:
-      mysqlInstallerUri: "http://bills-web-server.apps.tacos.dota-lab.iad.redhat.com/mysql-8.4.0-winx64.msi"
-      vcRedistributablesUri: "http://bills-web-server.apps.tacos.dota-lab.iad.redhat.com/VC_redist.x64.exe"
+      mysqlInstallerUri: "http://example.com/mysql-8.4.0-winx64.msi"
+      vcRedistributablesUri: "http://example.com/VC_redist.x64.exe"
       mysqlInstallerFile: "mysql-8.4.0-winx64.msi"
       vcRedistributablesFile: "vc_redist.x64.exe"
       mysqlBaseDataDir: 'C:\ProgramData\MySQL\MySQL Server 8.0'
@@ -152,7 +152,7 @@ vm:
     workload: server
     size: medium
     running: false
-    installationCdromUrl: 'http://rhdata6.dota-lab.iad.redhat.com/win2022.iso'
+    installationCdromUrl: 'http://example.com/win2022.iso'
     installationCdromStorageClass: odf-nvme-2-replicas
     installationCdromStorage: 20Gi
     rootDiskStorageClass: vm-odf-hdd-3-replicas
@@ -167,5 +167,5 @@ vm:
 route:
   wordpressFe:
     name: wordpress-fe
-    host: wordpress-demo-test.apps.tacos.dota-lab.iad.redhat.com
+    host: wordpress-demo.apps.example.com
 ```
