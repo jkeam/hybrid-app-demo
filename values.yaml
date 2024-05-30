@@ -1,11 +1,15 @@
 namespace:
-  name: hybrid-app-namespace
+  name: demo-hybrid
 
 serviceAccount:
   name: hybrid-app-sa
 
 roleBinding:
   name: hybrid-app-rolebinding
+
+secret:
+  wordpressDb:
+    name: wordpress-db-secret
 
 configMap:
   wordpressFeConfig:
@@ -67,6 +71,38 @@ pvc:
     volumeMode: Filesystem
 
 deployment:
+  redis:
+    name: wordpress-cache
+    replicas: 1
+    image: "redis:latest"
   wordpressFe:
-    dbUser: "wordpress_user"
-    dbName: "wordpress_db"
+    name: wordpress-fe
+    replicas: 1
+    dbHost: wordpress-be
+    dbUser: wordpress_user
+    dbName: wordpress_db
+    image: "wordpress:latest"
+
+vm:
+  wordpressBe:
+    name: wordpress-be
+    template: windows2k22-server-medium
+    flavor: medium
+    os: windows2k22
+    workload: server
+    size: medium
+    running: false
+    installationCdromUrl: 'http://rhdata6.dota-lab.iad.redhat.com/win2022.iso'
+    installationCdromStorage: 20Gi
+    rootDiskStorage: 100Gi
+    cpuCores: 4
+    cpuSockets: 1
+    cpuThreads: 1
+    memory: 16Gi
+    windowsDriversDiskImage: 'registry.redhat.io/container-native-virtualization/virtio-win-rhel9@sha256:a8d455491d6c1ff45c6d8d340aa804313ce5613a59f53c7f4a5fcb61c14cc9fc'
+    machineType: pc-q35-rhel9.2.0
+
+route:
+  wordpressFe:
+    name: wordpress-fe
+    host: wordpress-demo.apps.tacos.dota-lab.iad.redhat.com
