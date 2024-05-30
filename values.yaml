@@ -96,7 +96,7 @@ vm:
     os: windows2k22  # Operating system for the Windows VM
     workload: server  # Workload type for the Windows VM
     size: medium  # Size for the Windows VM
-    running: false  # Initial running state of the VM
+    running: true  # Initial running state of the VM
     installationCdromUrl: 'http://rhdata6.dota-lab.iad.redhat.com/win2022.iso'  # URL for the installation CDROM
     installationCdromStorageClass: odf-nvme-2-replicas  # Storage class for the installation CDROM
     installationCdromStorage: 20Gi  # Storage size for the installation CDROM

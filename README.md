@@ -151,7 +151,7 @@ vm:
     os: windows2k22
     workload: server
     size: medium
-    running: false
+    running: true
     installationCdromUrl: 'http://example.com/win2022.iso'
     installationCdromStorageClass: odf-nvme-2-replicas
     installationCdromStorage: 20Gi
