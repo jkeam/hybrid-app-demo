@@ -75,7 +75,6 @@ configMap:
   wordpressFeConfig:
     name: wordpress-config  # Name of the ConfigMap for WordPress front-end configuration
     wp_redis_host: wordpress-cache  # Name of the Redis Service for WordPress caching
-
   sysprepWindows:
     name: sysprep-wordpress-be  # Name of the ConfigMap for sysprep configuration of the Windows VM
     autounattend:
@@ -91,7 +90,6 @@ configMap:
       LocalAccountGroup: "Administrators"  # Group for the local admin account
       LocalAccountName: "Administrator"  # Name for the local admin account
       Username: "Administrator"  # Username for the local admin account
-
     postInstall:
       mysqlInstallerUri: "http://example.com/mysql-8.4.0-winx64.msi"  # URI to download MySQL installer
       vcRedistributablesUri: "http://example.com/VC_redist.x64.exe"  # URI to download Visual Studio Redistributables
@@ -102,7 +100,6 @@ configMap:
       mysqlServiceName: "MySQL80"  # Name of the MySQL service
       firewallRuleDisplayName: "MySQL Server"  # Display name for the firewall rule for MySQL
       additionalScripts: []  # List of additional PowerShell scripts to run post-install
-
     myIni:
       slowQueryLogFile: "WORDPRESS-BE-slow.log"  # File name for slow query log
       logErrorFile: "WORDPRESS-BE.err"  # File name for error log
@@ -126,7 +123,6 @@ pvc:
     storage: 10Gi  # Storage size for the PVC
     storageClassName: odf-nvme-2-replicas  # Storage class name for the PVC
     volumeMode: Filesystem  # Volume mode for the PVC
-
   wordpressPlugins:
     name: wordpress-plugins-pvc  # Name of the PersistentVolumeClaim for WordPress plugins
     accessMode: ReadWriteOnce  # Access mode for the PVC
@@ -139,7 +135,6 @@ deployment:
     name: wordpress-cache  # Name of the Redis deployment
     replicas: 1  # Number of replicas for Redis
     image: "redis:latest"  # Docker image for Redis
-
   wordpressFe:
     name: wordpress-fe  # Name of the WordPress front-end deployment
     replicas: 1  # Number of replicas for WordPress front-end
@@ -150,7 +145,6 @@ deployment:
 
 vm:
   wordpressBe:
-<<<<<<< HEAD
     name: wordpress-be
     template: windows2k22-server-medium
     flavor: medium
@@ -169,7 +163,6 @@ vm:
     memory: 16Gi
     windowsDriversDiskImage: 'registry.redhat.io/container-native-virtualization/virtio-win-rhel9@sha256:a8d455491d6c1ff45c6d8d340aa804313ce5613a59f53c7f4a5fcb61c14cc9fc'
     machineType: pc-q35-rhel9.2.0
-=======
     name: wordpress-be  # Name of the VirtualMachine for WordPress back-end
     template: windows2k22-server-medium  # Template for the Windows VM
     flavor: medium  # Flavor for the Windows VM
@@ -188,7 +181,6 @@ vm:
     memory: 16Gi  # Amount of memory for the VM
     windowsDriversDiskImage: 'registry.redhat.io/container-native-virtualization/virtio-win-rhel9@sha256:a8d455491d6c1ff45c6d8d340aa804313ce5613a59f53c7f4a5fcb61c14cc9fc'  # Image for the Windows drivers disk
     machineType: pc-q35-rhel9.2.0  # Machine type for the VM
->>>>>>> 36f534f675f8e6e643b1e8a45e1243ca0c7ba96d
 
 route:
   wordpressFe:
